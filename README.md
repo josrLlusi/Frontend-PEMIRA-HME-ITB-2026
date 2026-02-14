@@ -1,8 +1,23 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
+(Make sure you have a nodeJs, VSCode, and Git installed)
+Open the file/folder on your VS Code and install the library:
+```bash
+npm install
+```
+Make sure the node_modules folder exist after installing.
+Change the .env.example to .env.local
+Change the token or url to your liking
+After that, Open your terminal.
+Don't forget to change the directory to this project folder
+run this code on the terminal:
+```bash
+node src/scripts/setup-db.js
+```
+Make sure you got a completion message.
 
-First, run the development server:
+Run the development server:
 
 ```bash
 npm run dev
