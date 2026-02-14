@@ -1,109 +1,205 @@
-'use client';
-import NavBar from "../component/NavBar";
+"use client";
+import { useState, useEffect } from "react";
+import NavBar from "@/app/component/NavBar";
 import Cookies from "js-cookie";
-import { useEffect, useState } from "react";
 
-function Livecount() {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-  const TOTAL_VOTERS = 547;
-  const [ChampID, setChampID] = useState<string | undefined>(Cookies.get("ChampID"));
-  const [jumlah, setJumlah] = useState(0);
-  const [jumlahPercentage, setJumlahPercentage] = useState(0);
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL /*|| 'http://localhost:3000'*/;
+
+export default function LiveCount() {
+  const [cookieValue, setCookieValue] = useState<string | undefined>(undefined);
+  
+  // State untuk menyimpan semua data suara
+  const [stats, setStats] = useState({
+    total: 0,
+    kahim: { '00': 0, '01': 0 },
+    senator: { '00': 0, '01': 0 }
+  });
+  
+  const TARGET_KUORUM = 500; 
 
   useEffect(() => {
+    setCookieValue(Cookies.get("ChampID"));
+
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/live_count_total`);
-        const data = await response.json();
-
-        // Logging for debugging
-        console.log("Data fetched:", data);
-
-        setJumlah(data.suara);
-        setJumlahPercentage(
-          Math.min(100, Number(((data.suara / TOTAL_VOTERS) * 100).toFixed(2))) // Set 1% for each voter/total available voter 
-        );
+        const resTotal = await fetch(`${API_BASE_URL}/api/live_count`);
+        const data = await resTotal.json();
+        
+        // Simpan data dari backend ke state
+        if (data) {
+            setStats({
+                total: data.suara,
+                kahim: data.detail.kahim,
+                senator: data.detail.senator
+            });
+        }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Gagal mengambil data partisipasi:", error);
       }
     };
 
-    // Fetch data every 5 seconds
-    const intervalId = setInterval(fetchData, 5000);
-
-    // Cleanup on unmount
-    return () => clearInterval(intervalId);
+    fetchData();
+    const interval = setInterval(fetchData, 5000);
+    return () => clearInterval(interval);
   }, []);
 
+  const progressPercent = Math.min(Math.round((stats.total / TARGET_KUORUM) * 100), 100);
+
   return (
-    <main
-      className="flex w-[100vw] h-[200vh]"
-      style={{
-        background: 'linear-gradient(111.84deg, #DDC28E -1.42%, #77684C 65.2%)',
-        boxShadow: '0px 4px 4px 0px #00000040',
-      }}
-    >
-      <div className="Background Hero w-full min-h-full h-fit sm:min-h-0 sm:h-[200vh] m-auto overflow-hidden bg-[url('/mainbg.png')] bg-cover bg-center flex">
-        <div className="livecount animate-popup m-auto block pt-10 pb-10 w-[500px] md:w-[700px] h-fit rounded-3xl transition-all ease-in-out duration-1000">
-          <div className="tittlecontainer w-full h-[70px] flex">
-            <div className="wrapper flex m-auto w-fit h-[60px]">
-              <div className="dotsection w-[60px] h-full flex">
-                <div className="dot w-[60%] h-[60%] bg-[#731d1a] m-auto rounded-md animate-pulse"></div>
-              </div>
-              <div className="textSection h-full w-[200px] flex">
-                <h1 className="livecount m-auto text-[#731d1a] text-[36px] font-Algerian font-extrabold">Live Count</h1>
-              </div>
-            </div>
+    <main className="relative min-h-screen w-full bg-black flex flex-col items-center pb-32 overflow-x-hidden text-[#F8E5C1]">
+      
+      {/* BACKGROUND */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <img 
+          src="/thankyou-bg.png" 
+          alt="Background" 
+          className="w-full h-full object-cover opacity-60" 
+        />
+      </div>
+
+      {/* HEADER JUDUL */}
+      <div className="relative z-10 text-center mb-16 mt-32 md:mt-40 animate-fade-in px-4">
+        <h2 className="text-gradient-yellow font-lubrifont text-lg md:text-2xl tracking-[0.3em] uppercase mb-2">
+            STATISTIK PEMIRA HME ITB 2026
+        </h2>
+        <h1 className="text-gradient-silver font-lubrifont text-4xl md:text-6xl tracking-[0.1em] uppercase drop-shadow-2xl">
+            LIVE COUNT
+        </h1>
+        <div className="w-32 h-1 bg-gradient-to-r from-transparent via-[#FFC045] to-transparent mx-auto mt-6"></div>
+      </div>
+
+      {/* 2. DAFTAR KANDIDAT & SKOR */}
+      
+      {/* KAHIM */}
+      <section className="relative z-10 w-full max-w-7xl px-4 mb-24 animate-fade-in-up">
+        <h2 className="font-lubrifont text-center text-2xl md:text-3xl mb-12 tracking-widest text-[#FFFBB5] uppercase border-b border-white/10 pb-4 mx-auto max-w-lg">
+          KANDIDAT KETUA HIMPUNAN
+        </h2>
+        <div className="flex flex-wrap justify-center gap-10 md:gap-24">
+          <CandidateCard 
+            id="00" 
+            name="KOTAK KOSONG" 
+            photo="/silhouette.png" 
+            isSpecial 
+            votes={stats.kahim['00']}
+          />
+          <CandidateCard 
+            id="01" 
+            name="FAUZAN" 
+            photo="/cand-fauzan.png" 
+            votes={stats.kahim['01']}
+          />
+        </div>
+      </section>
+
+      {/* SENATOR */}
+      <section className="relative z-10 w-full max-w-7xl px-4 mb-24 animate-fade-in-up">
+        <h2 className="font-lubrifont text-center text-2xl md:text-3xl mb-12 tracking-widest text-[#FFFBB5] uppercase border-b border-white/10 pb-4 mx-auto max-w-lg">
+          KANDIDAT SENATOR
+        </h2>
+        <div className="flex flex-wrap justify-center gap-10 md:gap-24">
+          <CandidateCard 
+            id="00" 
+            name="KOTAK KOSONG" 
+            photo="/silhouette.png" 
+            isSpecial 
+            votes={stats.senator['00']} 
+          />
+          <CandidateCard 
+            id="01" 
+            name="QADAFI" 
+            photo="/cand-qadafi.png" 
+            votes={stats.senator['01']} 
+          />
+        </div>
+      </section>
+
+      {/* PANEL TOTAL SUARA */}
+      <div className="relative z-20 w-[90%] max-w-4xl px-6 py-10 bg-black/60 backdrop-blur-xl rounded-[2rem] border border-[#FFC045]/30 text-center shadow-[0_0_50px_rgba(0,0,0,0.8)] animate-popup">
+        
+        <h3 className="font-lubrifont text-xl md:text-2xl text-gradient-silver mb-4 tracking-widest uppercase">
+          TOTAL PARTISIPASI
+        </h3>
+        
+        <div className="text-7xl md:text-9xl font-bold text-gradient-yellow mb-8 font-lubrifont drop-shadow-[0_0_20px_rgba(255,192,69,0.3)]">
+          {stats.total}
+        </div>
+        
+        <div className="flex justify-between text-[10px] md:text-sm px-2 mb-3 text-white/50 font-lubrifont tracking-widest">
+            <span>START: 0</span>
+            <span>TARGET: {TARGET_KUORUM}</span>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="relative w-full h-10 md:h-14 bg-black/80 border border-white/10 rounded-full overflow-hidden shadow-inner p-1">
+          <div 
+            className="h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(255,192,69,0.4)]"
+            style={{ 
+                width: `${progressPercent}%`,
+                background: `linear-gradient(90deg, #8A6D3B 0%, #FFC045 50%, #DDC28E 100%)`
+            }}
+          >
+             <div className="w-full h-full relative overflow-hidden">
+                <div className="absolute inset-0 bg-white/20 skew-x-12 translate-x-full animate-shine"></div>
+             </div>
           </div>
-          <div className="subtitle w-full h-[40px] flex">
-            <h1 className="subtitle text-[#552624] m-auto text-[16pt] font-Algerian pl-3 pr-3 text-center">
-              PEMILIHAN KETUA HIMPUNAN HME ITB 2024/2025
-            </h1>
-          </div>
-          <div className="voteform block sm:flex w-full h-fit">
-            <div className="kolomkiri w-full sm:w-[50%] h-fit flex p-8">
-              <div className="card w-[200px] h-[300px] m-auto bg-white rounded-xl overflow-hidden">
-                <div className="nomor w-full text-black h-[15%] flex">
-                  <div className="nomor m-auto font-extrabold text-[18pt]">01</div>
-                </div>
-                <div className="gambar w-full h-[70%] bg-[url('/poggy.png')] bg-cover bg-center"></div>
-                <div className="nama text-black w-full h-[15%] flex">
-                  <h2 className="m-auto text-[14pt] font-Algerian">Poggy M. Gultom</h2>
-                </div>
-              </div>
-            </div>
-            <div className="kolomkanan w-full sm:w-[50%] h-fit flex p-8">
-              <div className="card w-[200px] h-[300px] m-auto bg-white rounded-xl overflow-hidden">
-                <div className="nomor w-full text-black h-[15%] flex">
-                  <div className="nomor m-auto font-extrabold text-[18pt]">02</div>
-                </div>
-                <div className="gambar w-full h-[70%] bg-[url('/kotak.png')] bg-cover bg-center"></div>
-                <div className="nama text-black w-full h-[15%] flex">
-                  <h2 className="m-auto text-[14pt] font-Algerian">Kotak Kosong</h2>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="counter w-full h-fit mt-3 flex">
-            <div className="wrapper m-auto h-fit w-[300px] p-1">
-              <h1 className="judul w-full h-fit text-center text-[#552624] font-Algerian font-extrabold text-[24pt]">TOTAL SUARA</h1>
-              <h1 className="judul w-full h-fit text-center text-[#552624] font-Algerian font-extrabold text-[40pt]">{jumlah}</h1>
-              <div className="loadingbar text-center m-auto h-[20px] overflow-hidden w-full bg-[#997329] drop-shadow-md">
-                <div
-                  className="progress relative h-full bg-gradient-to-r from-yellow-400 to-yellow-600"
-                  style={{
-                    width: `${jumlahPercentage}%`,
-                    transition: 'width 0.5s ease-in-out',
-                  }}
-                >{jumlahPercentage}%</div>
-              </div>
-            </div>
+          
+          <div className="absolute inset-0 flex items-center justify-center z-10">
+             <span className="font-lubrifont text-white text-lg md:text-xl drop-shadow-md tracking-widest">
+                {progressPercent}%
+             </span>
           </div>
         </div>
+        
+        <p className="mt-8 text-white/30 text-[10px] md:text-xs font-lubrifont uppercase tracking-[0.4em] animate-pulse">
+          • Real-time Data Connection •
+        </p>
       </div>
-      <NavBar data={ChampID} />
+
+      <div className="absolute top-0 left-0 w-full z-50">
+        <NavBar data={cookieValue} />
+      </div>
     </main>
   );
 }
 
-export default Livecount;
+// --- KOMPONEN KARTU KANDIDAT ---
+function CandidateCard({ id, name, photo, isSpecial = false, votes = 0 }: any) {
+  return (
+    <div className="relative flex flex-col items-center group transition-transform hover:scale-105 duration-500">
+      
+      <div className="absolute -top-4 w-[120%] h-[120%] z-0 bg-white/10 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+
+      {/* Area Foto */}
+      <div className="relative w-40 h-52 md:w-56 md:h-[280px] z-10 flex items-center justify-center mb-4">
+         <img 
+           src={photo} 
+           alt={name} 
+           className={`max-w-full max-h-full object-contain drop-shadow-2xl transition-all duration-500
+             ${isSpecial ? 'opacity-50' : 'grayscale group-hover:grayscale-0'}`} 
+         />
+         <div className="absolute top-0 -left-6 font-lubrifont text-xl text-white/30">
+           #{id}
+         </div>
+      </div>
+
+      {/* Label Nama */}
+      <div className="relative z-20 px-6 py-2 border border-white/10 rounded-lg min-w-[180px] text-center mb-4 bg-black/40 backdrop-blur-sm">
+        <span className="font-lubrifont text-lg md:text-xl text-gradient-silver tracking-widest uppercase font-bold">
+          {name}
+        </span>
+      </div>
+
+      {/* SCORE BOARD */}
+      <div className="relative z-20 flex flex-col items-center animate-popup">
+        <div className="text-4xl md:text-6xl font-lubrifont font-bold text-[#FFC045] drop-shadow-[0_0_15px_rgba(255,192,69,0.5)]">
+            {votes}
+        </div>
+        <div className="text-[10px] md:text-xs tracking-[0.3em] text-white/50 uppercase mt-1">
+            SUARA
+        </div>
+      </div>
+
+    </div>
+  );
+}

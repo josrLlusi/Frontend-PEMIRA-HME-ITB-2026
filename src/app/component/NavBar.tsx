@@ -1,79 +1,104 @@
 'use client'
-
 import Image from 'next/image';
 import Cookies from 'js-cookie';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import LogoutModal from '@/app/component/LogOutModal'; 
 
-interface NavBarProps {
-  data: any;
-}
-
-const NavBar: React.FC<NavBarProps> = ({ data }) => {
+const NavBar = ({ data }: any) => {
   const router = useRouter();
-  const [buttonStyle, setButtonStyle] = useState('bg-transparent bg-clip-text font-bold pl-6 pr-6 text-transparent bg-gradient-to-b from-[#F8E5C1] to-[#928671] hover:from-[#FFC045] hover:to-[#997329]');
-  const [buttonText, setButtonText] = useState('Login');
-  const [liveCountButtonStyle, setLiveCountButtonStyle] = useState('bg-transparent bg-clip-text font-bold pl-6 pr-6 text-transparent bg-gradient-to-b from-[#F8E5C1] to-[#928671] hover:from-[#FFC045] hover:to-[#997329]');
-  const [liveCountButtonText, setLiveCountButtonText] = useState('Live Count');
+  const pathname = usePathname();
+  const [userName, setUserName] = useState<string>("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
-    if (data) {
-      setButtonStyle('bg-transparent bg-clip-text font-bold pl-6 pr-6 text-transparent bg-gradient-to-b from-[#F8E5C1] to-[#928671] hover:from-[#FFC045] hover:to-[#997329]');
-      setButtonText('Logout');
-    } else {
-      setButtonStyle('bg-transparent bg-clip-text font-bold pl-6 pr-6 text-transparent bg-gradient-to-b from-[#F8E5C1] to-[#928671] hover:from-[#FFC045] hover:to-[#997329]');
-      setButtonText('Login');
-    }
-  }, [data]);
 
-  const actionHandler = () => {
-    if (data) {
-      Cookies.remove('ChampID');
-      Cookies.remove('ChampAccess');
-      setButtonStyle('bg-[#E8DFA0] text-black pl-6 pr-6');
-      setButtonText('Login');
-      router.push('/');
+    if (pathname === "/") {
+      setIsLoggedIn(false);
+      return;
+    }
+
+    const hasSession = !!data || !!Cookies.get("ChampID");
+    setIsLoggedIn(hasSession);
+
+    if (hasSession) {
+      const nameFromCookie = Cookies.get("ChampName");
+      setUserName(nameFromCookie || "Mahasiswa");
+    }
+  }, [data, pathname]);
+
+
+  const handleNavButtonClick = () => {
+    if (isLoggedIn) {
+
+      setShowLogoutModal(true);
     } else {
+
       router.push('/');
     }
   };
 
-  const liveCountHandler = () => {
-    router.push('/livecount');
+
+  const confirmLogout = () => {
+    Cookies.remove('ChampID');
+    Cookies.remove('ChampName');
+    Cookies.remove('ChampAccess');
+    Cookies.remove('ChampSig');
+    
+
+    setIsLoggedIn(false);
+    setShowLogoutModal(false);
+    
+
+    router.push('/');
   };
 
   return (
-    <div className="NavBar w-full h-24 absolute flex">
-      <div className="container h-[60px] w-[1648px] bg-gradient-to-r from-[#3D3320] to-[#A38855] flex rounded-[50px] m-auto mb-0 shadow-xl overflow-hidden opacity-80" style={{ top: '60px', left: '136px', gap: '10px' }}>
-        <div className="logoContainer h-full w-[90px] flex">
-          <Image
-            className="logo h-[70%] w-auto m-auto"
-            src={"/hme.png"}
-            alt={"Logo HME"}
-            width={100}
-            height={100}
-            priority
-          />
+    <>
+      <nav className="fixed top-0 left-0 w-full z-[80] transition-all duration-300">
+        <div className="mx-auto px-4 md:px-8 py-3 flex justify-between items-center bg-black/40 backdrop-blur-md border-b border-white/5">
+        
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => router.push('/')}>
+            <div className="relative h-10 w-10 md:h-16 md:w-16">
+              <Image src="/Group 149.png" alt="Logo" fill className="object-contain" />
+            </div>
+            <div className="block">
+              <h1 className="text-[#FFC045] font-lubrifont text-lg leading-none uppercase">PEMIRA HME</h1>
+              <p className="text-gray-400 text-[10px] font-lubrifont font-bold tracking-[0.2em]">ITB 2026</p>
+            </div>
+          </div>
+
+        
+          <div className="flex items-center gap-3 md:gap-6">
+            <button onClick={() => router.push('/livecount')} className="px-4 py-1.5 border border-[#FFC045]/40 rounded-full hover:bg-[#FFC045]/10 transition-all">
+              <span className="text-[#FFC045] font-bold text-[10px] md:text-sm tracking-wide">LIVE COUNT</span>
+            </button>
+
+            {isLoggedIn && (
+              <div className="hidden lg:flex flex-col items-end mr-1">
+                <span className="text-[9px] text-gray-500 uppercase tracking-widest">Logged in</span>
+                <span className="text-white font-bold text-sm">{userName.split(' ')[0]}</span>
+              </div>
+            )}
+
+            <button
+              onClick={handleNavButtonClick}
+              className={`px-4 py-1.5 rounded-full font-bold text-[10px] md:text-sm transition-all ${isLoggedIn ? "bg-[#D22B2B] text-white hover:bg-red-700" : "bg-[#FFC045] text-black hover:bg-yellow-500"}`}
+            >
+              {isLoggedIn ? "LOGOUT" : "LOGIN"}
+            </button>
+          </div>
         </div>
-        <div className="blankspace w-[calc(100%-320px)]"/>
-        <div className="livecountbutton flex h-full w-[200px]">
-          <button
-            className={`button font-bold p-2 m-auto rounded-full ${liveCountButtonStyle} transition-all ease-in-out duration-300 NavBarText`}
-            onClick={liveCountHandler}
-          >
-            {liveCountButtonText}
-          </button>
-        </div>
-        <div className="authbutton flex h-full w-[120px]">
-          <button
-            className={`button font-bold p-2 m-auto rounded-full ${buttonStyle} transition-all ease-in-out duration-300 NavBarText`}
-            onClick={actionHandler}
-          >
-            {buttonText}
-          </button>
-        </div>
-      </div>
-    </div>
+      </nav>
+
+
+      <LogoutModal 
+        isOpen={showLogoutModal} 
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={confirmLogout}
+      />
+    </>
   );
 };
 
