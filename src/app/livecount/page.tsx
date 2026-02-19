@@ -9,13 +9,14 @@ export default function LiveCount() {
   const [cookieValue, setCookieValue] = useState<string | undefined>(undefined);
   
   // State untuk menyimpan semua data suara
+  const [totalVoted, setTotalVoted] = useState(0);
   const [stats, setStats] = useState({
     total: 0,
-    kahim: { '00': 0, '01': 0 },
-    senator: { '00': 0, '01': 0 }
+    kahim: { '00': '01'},
+    senator: { '00': '01' }
   });
   
-  const TARGET_KUORUM = 500; 
+  const TARGET_KUORUM = 500; //sekian sekian
 
   useEffect(() => {
     setCookieValue(Cookies.get("ChampID"));
@@ -26,12 +27,8 @@ export default function LiveCount() {
         const data = await resTotal.json();
         
         // Simpan data dari backend ke state
-        if (data) {
-            setStats({
-                total: data.suara,
-                kahim: data.detail.kahim,
-                senator: data.detail.senator
-            });
+        if (data && typeof data.suara === 'number') {
+          setTotalVoted(data.suara);
         }
       } catch (error) {
         console.error("Gagal mengambil data partisipasi:", error);
@@ -43,7 +40,7 @@ export default function LiveCount() {
     return () => clearInterval(interval);
   }, []);
 
-  const progressPercent = Math.min(Math.round((stats.total / TARGET_KUORUM) * 100), 100);
+  const progressPercent = Math.min(Math.round((totalVoted / TARGET_KUORUM) * 100), 100);
 
   return (
     <main className="relative min-h-screen w-full bg-black flex flex-col items-center pb-32 overflow-x-hidden text-[#F8E5C1]">
@@ -68,7 +65,7 @@ export default function LiveCount() {
         <div className="w-32 h-1 bg-gradient-to-r from-transparent via-[#FFC045] to-transparent mx-auto mt-6"></div>
       </div>
 
-      {/* 2. DAFTAR KANDIDAT & SKOR */}
+      {/* DAFTAR KANDIDAT */}
       
       {/* KAHIM */}
       <section className="relative z-10 w-full max-w-7xl px-4 mb-24 animate-fade-in-up">
@@ -80,14 +77,12 @@ export default function LiveCount() {
             id="00" 
             name="KOTAK KOSONG" 
             photo="/silhouette.png" 
-            isSpecial 
-            votes={stats.kahim['00']}
+            isSpecial
           />
           <CandidateCard 
             id="01" 
             name="FAUZAN" 
-            photo="/cand-fauzan.png" 
-            votes={stats.kahim['01']}
+            photo="/cand-fauzan.png"
           />
         </div>
       </section>
@@ -102,14 +97,12 @@ export default function LiveCount() {
             id="00" 
             name="KOTAK KOSONG" 
             photo="/silhouette.png" 
-            isSpecial 
-            votes={stats.senator['00']} 
+            isSpecial
           />
           <CandidateCard 
             id="01" 
             name="QADAFI" 
-            photo="/cand-qadafi.png" 
-            votes={stats.senator['01']} 
+            photo="/cand-qadafi.png"
           />
         </div>
       </section>
@@ -122,7 +115,7 @@ export default function LiveCount() {
         </h3>
         
         <div className="text-7xl md:text-9xl font-bold text-gradient-yellow mb-8 font-lubrifont drop-shadow-[0_0_20px_rgba(255,192,69,0.3)]">
-          {stats.total}
+          {totalVoted}
         </div>
         
         <div className="flex justify-between text-[10px] md:text-sm px-2 mb-3 text-white/50 font-lubrifont tracking-widest">
@@ -164,7 +157,7 @@ export default function LiveCount() {
 }
 
 // --- KOMPONEN KARTU KANDIDAT ---
-function CandidateCard({ id, name, photo, isSpecial = false, votes = 0 }: any) {
+function CandidateCard({ id, name, photo, isSpecial = false}: any) {
   return (
     <div className="relative flex flex-col items-center group transition-transform hover:scale-105 duration-500">
       
@@ -176,9 +169,9 @@ function CandidateCard({ id, name, photo, isSpecial = false, votes = 0 }: any) {
            src={photo} 
            alt={name} 
            className={`max-w-full max-h-full object-contain drop-shadow-2xl transition-all duration-500
-             ${isSpecial ? 'opacity-50' : 'grayscale group-hover:grayscale-0'}`} 
+             ${isSpecial ? 'opacity-50' : 'grayscale-0'}`} 
          />
-         <div className="absolute top-0 -left-6 font-lubrifont text-xl text-white/30">
+         <div className="absolute top-0 -left-8 font-lubrifont text-xl text-white/30">
            #{id}
          </div>
       </div>
@@ -188,16 +181,6 @@ function CandidateCard({ id, name, photo, isSpecial = false, votes = 0 }: any) {
         <span className="font-lubrifont text-lg md:text-xl text-gradient-silver tracking-widest uppercase font-bold">
           {name}
         </span>
-      </div>
-
-      {/* SCORE BOARD */}
-      <div className="relative z-20 flex flex-col items-center animate-popup">
-        <div className="text-4xl md:text-6xl font-lubrifont font-bold text-[#FFC045] drop-shadow-[0_0_15px_rgba(255,192,69,0.5)]">
-            {votes}
-        </div>
-        <div className="text-[10px] md:text-xs tracking-[0.3em] text-white/50 uppercase mt-1">
-            SUARA
-        </div>
       </div>
 
     </div>
