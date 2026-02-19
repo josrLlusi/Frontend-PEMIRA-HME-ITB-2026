@@ -5,7 +5,7 @@ import Cookies from "js-cookie";
 import imageCompression from "browser-image-compression";
 import LogoHeader from "@/app/component/LogoHeader";
 import Loading from "@/app/component/Loading";
-//port { time } from "console";
+
 
 export default function VerificationPage() {
   const router = useRouter();
@@ -14,13 +14,20 @@ export default function VerificationPage() {
   
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL /*|| 'http://localhost:3000'*/;
   const API_TOKEN = process.env.NEXT_PUBLIC_API_TOKEN;
-  const username = Cookies.get("ChampID") || "User";
   const [photo, setPhoto] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    const id = Cookies.get("ChampID");
+    if (!id) {
+      router.push("/");
+    }
+  }, [router]);
+  
+  useEffect(() => {
+
     async function enableCamera() {
       try {
         const mediaStream = await navigator.mediaDevices.getUserMedia({ 

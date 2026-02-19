@@ -31,19 +31,19 @@ export default function VotePage() {
     };
 
   useEffect(() => {
-    const validSlugs = ["ketua", "senator"];
+    const validSlugs = ["kahim", "senator"];
     if (!validSlugs.includes(slug as string)) {
       notFound();
     }
     const id = Cookies.get("ChampID");
-    /*if (!id) {
+    if (!id) {
       router.push("/"); // Proteksi jika user mencoba akses tanpa login
-    }*/
+    }
     setCookieValue(id);
   }, [slug, router]);
 
-  // Spesifikasi Calon Tunggal Kahim
-  const dataKetua = [
+  // Spesifikasi Kahim
+  const dataKahim = [
     { id: "00", name: "KOTAK KOSONG", image: "/silhouette.png" }, 
     { id: "01", name: "FAUZAN", image: "/cand-fauzan.png" },
   ];
@@ -53,10 +53,10 @@ export default function VotePage() {
     { id: "01", name: "QADAFI", image: "/cand-qadafi.png" },
   ];
 
-  const isKetua = slug === "ketua";
-  const candidates = isKetua ? dataKetua : dataSenator;
-  const titleCategory = isKetua ? "KAHIM" : "SENATOR";
-  const bgDecor = isKetua ? "/bg-decor-kahim.png" : "/bg-decor-senator.png";
+  const isKahim = slug === "kahim";
+  const candidates = isKahim ? dataKahim : dataSenator;
+  const titleCategory = isKahim ? "KAHIM" : "SENATOR";
+  const bgDecor = isKahim ? "/bg-decor-kahim.png" : "/bg-decor-senator.png";
 
   const handleVoteSubmit = async () => {
     if (!selectedId || loading) return;

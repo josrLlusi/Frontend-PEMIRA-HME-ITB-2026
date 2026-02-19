@@ -1,7 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LogoHeader from "@/app/component/LogoHeader";
+import Cookies from "js-cookie";
 
 export default function DisclaimerPage() {
   const router = useRouter();
@@ -9,6 +10,13 @@ export default function DisclaimerPage() {
   const [showCopyPopup, setShowCopyPopup] = useState(false);
 
   const contactPerson = "081234567890 (Panitia PEMIRA)";
+
+  useEffect(() => {
+    const id = Cookies.get("ChampID");
+    if (!id) {
+      router.push("/");
+    }
+    }, [router]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(contactPerson);

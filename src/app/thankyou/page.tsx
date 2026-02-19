@@ -2,12 +2,17 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import NavBar from "@/app/component/NavBar";
+import Cookies from "js-cookie";
 
 export default function ThankYouPage() {
   const router = useRouter();
   const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {
+    const id = Cookies.get("ChampID");
+    if (!id) {
+      router.push("/");
+    }
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {

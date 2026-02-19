@@ -19,6 +19,9 @@ export default function SelectionPage() {
 
   useEffect(() => {
     const id = Cookies.get("ChampID");
+      if (!id) {
+        router.push("/");
+      }
     const checkStatus = async () => {
       try {
         const [resKetua, resSenator] = await Promise.all([
@@ -48,7 +51,7 @@ export default function SelectionPage() {
       }
     };
     checkStatus();
-  }, []);
+  }, [router]);
 
   const handleLogout = () => {
     Cookies.remove("ChampID");

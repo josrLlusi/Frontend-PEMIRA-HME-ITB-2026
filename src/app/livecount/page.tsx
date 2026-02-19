@@ -10,12 +10,7 @@ export default function LiveCount() {
   
   // State untuk menyimpan semua data suara
   const [totalVoted, setTotalVoted] = useState(0);
-  const [stats, setStats] = useState({
-    total: 0,
-    kahim: { '00': '01'},
-    senator: { '00': '01' }
-  });
-  
+
   const TARGET_KUORUM = 500; //sekian sekian
 
   useEffect(() => {
