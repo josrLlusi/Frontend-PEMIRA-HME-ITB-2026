@@ -13,6 +13,7 @@ export default function ThankYouPage() {
     if (!id) {
       router.push("/");
     }
+    
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
