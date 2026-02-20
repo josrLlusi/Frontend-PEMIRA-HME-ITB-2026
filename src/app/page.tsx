@@ -3,168 +3,234 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Loading from "@/app/component/Loading";
 import Cookies from "js-cookie";
+import ErrorDialogBox from "@/app/component/ErrorDialogBox";
 import NavBar from "@/app/component/NavBar";
-import ErrorDialogBox from "./component/ErrorDialogBox";
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-const API_TOKEN = process.env.NEXT_PUBLIC_API_TOKEN;
+
+// KONFIGURASI API
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL /*|| 'http://localhost:3000'*/;
+const TOKEN = process.env.NEXT_PUBLIC_API_TOKEN;
 
 export default function Auth() {
-
-  const [ErrorMessage, setErrorMessage] = useState("")
-  const [ErrorStatus, setErrorStatus] = useState(false)
-
-  // ERROR HANDLER
-  const ErrorHandler = (message:string) => {
-    console.log("nih pesan:", message)
-    setErrorMessage(message);
-    
-    setErrorStatus(true);
+  // --- STATE SYSTEM ---
+  const [ErrorMessage, setErrorMessage] = useState("");
+  const [ErrorStatus, setErrorStatus] = useState(false);
+  const [LoadingCondition, setLoadingCondition] = useState(false);
   
-    // Delay 4 detik
+  // --- STATE INPUT DATA ---
+  const [name, setName] = useState("");         
+  const [username, setUsername] = useState(""); 
+  const [password, setPassword] = useState(""); 
+  
+  // --- STATE UI ---
+  const [showPassword, setShowPassword] = useState(false);
+  const route = useRouter();
+
+  // HANDLER ERROR
+  const ErrorHandler = (message: string) => {
+    setErrorMessage(message);
+    setErrorStatus(true);
     setTimeout(() => {
       setErrorStatus(false);
-    }, 4000); 
-  }
-  
+    }, 4000);
+  };
 
-
-  // Pengecekan Cookies
-  const [cookieValue, setCookieValue] = useState<string | undefined>(
-    Cookies.get("ChampID")
-  );
   useEffect(() => {
-    setCookieValue(Cookies.get("ChampID"));
-    if (Cookies.get('AuthError')){
-      ErrorHandler("AUTENTIKASI GAGAL!!")
+    if (Cookies.get('AuthError')) {
+      ErrorHandler("AUTENTIKASI GAGAL!!");
       Cookies.remove('AuthError');
     }
   }, []);
 
-
-  // Fungsi login
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [LoadingCondition, setLoadingCondition] = useState(false);
-  const route = useRouter();
-
-  const TOKEN = process.env.NEXT_PUBLIC_API_TOKEN;
-
-  const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(event.target.value);
+  // --- LOGIKA INPUT ---
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value;
+    const formattedName = input.replace(/\b\w/g, (char) => char.toUpperCase());
+    setName(formattedName);
   };
 
-  const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(event.target.value);
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value.toUpperCase());
   };
 
+  // --- LOGIKA SUBMIT UTAMA ---
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    
+    if (!name.trim()) {
+       ErrorHandler("NAMA HARUS DIISI!!");
+       return;
+    }
+
     setLoadingCondition(true);
 
-    // Struktur body request
     const requestBody = {
       username: username,
-      pass: password,
+      pass: password, 
       token: TOKEN,
     };
 
-    //console.log(JSON.stringify(requestBody));
-
     try {
-      // Melakukan POST request
-      const response = await fetch(
-        `${API_BASE_URL}/api/login`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestBody),
-        }
-      );
-
-      // Mengubah response menjadi JSON
+      // 1. REQUEST LOGIN
+      const response = await fetch(`${API_BASE_URL}/api/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      });
       const data = await response.json();
 
-      // Mengecek apakah response memiliki atribut "ID"
       if (data.ID) {
-        //console.log("Login berhasil, ID:", data.ID);
-        Cookies.set("ChampID", data.ID, { expires: 1 });
+        // Login Sukses
+        Cookies.set("ChampID", data.ID, { expires: 1, secure: true, sameSite: 'strict' });
+        Cookies.set("ChampName", name, { expires: 1, secure: true, sameSite: 'strict' }); 
 
-        route.push("/verification");
+        /* {CEK VALIDITAS AKUN}
+        const isThereRes = await fetch(`${API_BASE_URL}/api/is_there`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: data.ID, token: TOKEN }),
+        });
+        const isThereData = await isThereRes.json();*/
 
-        // Lakukan sesuatu dengan ID yang didapat
-      } else {
-        console.log("Login gagal, pesan error:", data.message);
-        setLoadingCondition(false);
-        if(data.message == "Username, password, dan token harus diisi.") {
-          ErrorHandler("FORM HARUS DILENGKAPI!!")
-        } else {
-          ErrorHandler("LOGIN TIDAK VALID!!")
-        }
+        Cookies.set("ChampAccess", "granted", { expires: 1 });
         
 
-        // Tampilkan pesan error atau lakukan sesuatu
+          // 3. CEK STATUS VOTE
+        const checkVoteRes = await fetch(`${API_BASE_URL}/api/is_vote`, {
+           method: "POST",
+           headers: { "Content-Type": "application/json" },
+           body: JSON.stringify({ username: data.ID, token: TOKEN }),
+          });
+        const voteStatus = await checkVoteRes.json();
+
+        if (voteStatus.data === "true") {
+          route.push("/thankyou");
+        } else {
+          route.push("/disclaimer");
+        }
+
+       } else {
+          setLoadingCondition(false);
+          //ErrorHandler("DATA AKUN TIDAK DITEMUKAN!!");
+          if (data.message === "Username dan password harus diisi.") {
+            ErrorHandler("FORM HARUS DILENGKAPI!!");
+        } else {
+          ErrorHandler("AKUN TIDAK DITEMUKAN!!");
+        //setLoadingCondition(false);
+        }
+        
       }
     } catch (error) {
-      console.error("Terjadi kesalahan saat melakukan request:", error);
-      ErrorHandler("SERVER CONNECTION ERROR")
+      console.error("Terjadi kesalahan:", error);
+      setLoadingCondition(false);
+      ErrorHandler("SERVER CONNECTION ERROR");
     }
   };
 
-  return (
-    <main className="flex w-[100vw] h-[100vh]" style={{ background: 'linear-gradient(111.84deg, #DDC28E -1.42%, #77684C 65.2%)', boxShadow: '0px 4px 4px 0px #00000040' }}>
-      {/* Bagian lain dari komponen */}
-      <div className="Background Hero w-full h-full m-auto overflow-hidden bg-[url('/mainbg.png')] bg-cover flex">
-        <div className="blankspace h-full w-[calc(100%-720px)]"/>
-        <div className="loginspace h-full w-[720px] flex">
-          <div className="logincontainer animate-popup m-auto block pt-12 pb-18 w-[350px] md:w-[500px] h-[400px] rounded-3xl  transition-all ease-in-out duration-6000"> {/* Warna textbox agak jelek sini aku perbaiki bg-[rgba(181,126,75,0.31)] lg:bg-[rgba(220,255,203,0.0)] */}
-            <div className="title leading-tight w-full text-center text-[60pt] font-extrabold text-[#F8E5C1] font-Algerian">
-              PEMIRA HME ITB
-            </div>
-            <div className="maincontent h-fit relative top-[-205px] block">
-            <div className="title leading-tight w-full text-center text-[60pt] font-extrabold bg-clip-text text-transparent bg-gradient-to-b from-[#221D11] via-[#221D11] to-[#A38855] font-Algerian">
-              PEMIRA HME ITB
-            </div>
-              <form
-                onSubmit={handleSubmit}
-                className="inputSection block p-4 mt-[20px]"
-              >
-                <div className="username w-full flex pt-2 pb-2">
-                  <input
-                    type="text"
-                    className="username w-[85%] m-auto p-2 text-black rounded-lg font-['Abhaya_Libre_ExtraBold']"
-                    placeholder="Username"
-                    value={username}
-                    onChange={handleUsernameChange}
-                  />
-                </div>
-                <div className="pass w-full flex pt-2">
-                  <input
-                    type="password"
-                    className="password w-[85%] m-auto p-2 text-black rounded-lg font-['Abhaya_Libre_ExtraBold']"
-                    placeholder="Password"
-                    value={password}
-                    onChange={handlePasswordChange}
-                  />
-                </div>
-                <div className="submitsection w-full flex mt-8">
-                  <button
-                  type="submit"
-                  className="button m-auto ButtonText pt-2 pb-2 px-6 text-black rounded-lg bg-[#B3403D] hover:bg-[#8A2C2A] transition-colors duration-300"
-                  >
-                  LOGIN
-                  </button>
-                </div>
+  // --- RENDER UI ---
+return (
+    <main className="relative w-full min-h-screen bg-black flex flex-col md:flex-row overflow-x-hidden">
 
-              </form>
-            </div>
+      {/* BACKGROUND GRADIENT & DECORATION */}
+
+      <div className="fixed inset-0 z-0 bg-gradient-to-b from-[#1A1A1A] to-[#010101]"></div>
+      
+      <img 
+        src="/castle.png" 
+        alt="Castle Decoration" 
+        className="fixed inset-0 w-full h-full object-fill object-bottom z-10 opacity-60 md:opacity-100 pointer-events-none" 
+      />
+
+      {/* KONTEN UTAMA */}
+      <div className="relative z-20 w-full md:w-[60%] lg:w-[50%] ml-auto min-h-screen flex flex-col justify-center items-end py-20 px-8 md:pr-16 lg:pr-24">
+        
+        {/* JUDUL RESPONSIVE */}
+        <div className="text-right mb-12 select-none flex flex-col items-end w-full">
+          <div className="flex flex-wrap justify-end items-baseline gap-2 md:gap-3 leading-none">
+            <h1 className="font-lubrifont text-[2.8rem] sm:text-[3.5rem] md:text-[4.5rem] lg:text-[5.5rem] text-gradient-yellow tracking-wider">
+              PEMIRA
+            </h1>
+            <h2 className="font-lubrifont text-[2rem] sm:text-[2.5rem] md:text-[3.5rem] lg:text-[4rem] text-gradient-silver">
+              HME
+            </h2>
+          </div>
+          
+          <div className="flex items-center gap-3 mt-[-5px] leading-none">
+            <span className="font-lubrifont text-gray-400 text-lg md:text-2xl tracking-widest mt-2">
+              ITB
+            </span>
+            <span className="font-lubrifont text-[2.8rem] sm:text-[3.5rem] md:text-[4.5rem] lg:text-[5.5rem] text-gradient-yellow">
+              2026
+            </span>
           </div>
         </div>
+
+        {/* FORM INPUT RESPONSIVE */}
+        <form onSubmit={handleSubmit} className="w-full flex flex-col gap-5 items-end">
+          
+          <input
+            type="text"
+            placeholder="NAMA LENGKAP"
+            className="w-full max-w-[480px] bg-[#D9D9D9] text-[#292216] font-lubrifont font-extrabold text-lg md:text-xl py-4 px-6 rounded-lg outline-none placeholder-[#777] shadow-inner focus:ring-2 focus:ring-[#FFC045] transition-all"
+            value={name}
+            onChange={handleNameChange}
+            required
+          />
+
+          <input
+            type="text"
+            placeholder="NIM"
+            className="w-full max-w-[480px] bg-[#D9D9D9] text-[#292216] font-lubrifont font-extrabold text-lg md:text-xl py-4 px-6 rounded-lg outline-none placeholder-[#777] shadow-inner focus:ring-2 focus:ring-[#FFC045] transition-all"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+
+          <div className="relative w-full max-w-[480px]">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="PASSWORD"
+              className="w-full bg-[#D9D9D9] text-[#292216] font-lubrifont font-extrabold text-lg md:text-xl py-4 px-6 rounded-lg outline-none placeholder-[#777] shadow-inner pr-14 focus:ring-2 focus:ring-[#FFC045] transition-all"
+              value={password}
+              onChange={handlePasswordChange}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-black transition-colors"
+            >
+              {showPassword ? (
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                  <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
+                  <path fillRule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 010-1.113zM17.25 12a5.25 5.25 0 11-10.5 0 5.25 5.25 0 0110.5 0z" clipRule="evenodd" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                </svg>
+              )}
+            </button>
+          </div>
+
+          <div className="w-full max-w-[480px] flex justify-center mt-6">
+            <button
+              type="submit"
+              disabled={LoadingCondition}
+              className="group px-12 py-3 bg-gradient-to-b from-[#FFFFFF] via-[#CCCCCC] to-[#999999] border-2 border-white/50 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] active:scale-95"
+            >
+              <span className="font-bold font-lubrifont text-2xl tracking-[0.2em] text-black">
+                LOGIN
+              </span>
+            </button>
+          </div>
+
+        </form>
       </div>
+
+      {/* OVERLAYS */}
       <Loading condition={LoadingCondition} />
-      <NavBar data={cookieValue} />  
-      <ErrorDialogBox condition={ErrorStatus} errormessage={ErrorMessage}/>
+      <ErrorDialogBox condition={ErrorStatus} errormessage={ErrorMessage} />
+      <NavBar data={null} />
     </main>
   );
 }

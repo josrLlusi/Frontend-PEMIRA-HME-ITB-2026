@@ -1,83 +1,49 @@
-/*Global styling of the web*/
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap');
+/* 1. IMPORT FONT GOOGLE (Untuk Input: Abhaya Libre) */
+@import url('https://fonts.googleapis.com/css2?family=Abhaya+Libre:wght@800&display=swap');
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
-/* 2024_13223048 */
-
-/* filepath: /d:/Fronted-PEMIRA-HME-ITB-2024/src/app/globals.css */
+/* 2. IMPORT FONT LOKAL (Untuk Judul: Lubrifont) */
 @font-face {
-  font-family: 'Algerian';
-  src: url('/fonts/algerian.woff2') format('woff2'),
-       url('/fonts/algerian.woff') format('woff'),
-       url('/fonts/algerian.ttf') format('truetype');
+  font-family: 'Lubrifont';
+  src: url('/font/WDXLLubrifontSC-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
 
-.font-Algerian {
-  font-family: 'Algerian', sans-serif;
+/* --- UTILITY CLASSES --- */
+
+/* Font Families */
+.font-lubrifont {
+  font-family: 'Lubrifont', sans-serif;
+}
+.font-abhaya {
+  font-family: 'Abhaya Libre', serif;
 }
 
-.ButtonText {
-  background: linear-gradient(90.03deg, #FFC045 0.03%, #997329 128.96%);
-  width: 200px;
-  height: 53px;
-  border-radius: 20px 0px 0px 0px;
-  opacity: 0.7;
-  font-family: 'Abhaya Libre ExtraBold';
-  font-size: 28px;
-  font-weight: 800;
-  line-height: 33.03px;
-  text-align: center;
-  color: #292216;
-  ; 
+/* Gradient Text: Kuning (PEMIRA & 2026) */
+/* Sesuai Gradient Guide: FFFFFF -> FFF300 */
+.text-gradient-yellow {
+  background: linear-gradient(180deg, #FFFFFF 20%, #FFF300 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
 }
 
-.RegularText {
-  font-family: 'Abhaya Libre ExtraBold';
-  font-size: 26px;
-  font-weight: 800;
-  line-height: 30.67px;
-  text-align: left;
-  text-underline-position: from-font;
-  text-decoration-skip-ink: none;
+/* Gradient Text: Silver (HME) */
+/* Sesuai Gradient Guide: FFFFFF -> 999999 */
+.text-gradient-silver {
+  background: linear-gradient(180deg, #FFFFFF 20%, #999999 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
 }
 
-.NavBarText {
-  font-family: 'Abhaya Libre ExtraBold';
-  font-size: 24px;
-  font-weight: 800;
-  line-height: 20px;
-  text-align: center;
-  text-decoration-line: underline;
-  text-decoration-style: solid;
-  text-underline-position: from-font;
-  text-decoration-skip-ink: auto;
+/* Reset Background */
+body {
+  background-color: #000;
+  margin: 0;
+  padding: 0;
 }
