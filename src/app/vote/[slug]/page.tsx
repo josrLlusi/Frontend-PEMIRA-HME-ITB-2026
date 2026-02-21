@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import Loading from "@/app/component/Loading";
 import LogoHeader from "@/app/component/LogoHeader";
 import ErrorDialogBox from "@/app/component/ErrorDialogBox";
+import Image from "next/image";
 
 // KONFIGURASI PRODUKSI
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL /*|| 'http://localhost:3000'*/;
@@ -94,11 +95,13 @@ export default function VotePage() {
     <main className="relative w-full min-h-screen bg-black flex flex-col items-center overflow-x-hidden">
       
       {/* BACKGROUND DECORATION */}
-      <div className="fixed inset-0 z-0 pointer-events-none flex items-end justify-center">
-         <img 
+      <div className="fixed inset-0 z-0 pointer-events-none">
+         <Image 
             src={bgDecor} 
-            alt="Background Frame" 
-            className="w-full h-full object-fill opacity-100"
+            alt="Background Frame"
+            fill
+            priority
+            className="object-fill opacity-100"
          />
       </div>
 
@@ -133,10 +136,12 @@ export default function VotePage() {
                         >
                             {/* GLOW EFFECT */}
                             {(isHovered || isSelected) && (
-                                <img 
+                                <Image 
                                     src="/Rectangle 82.png" 
-                                    alt="glow" 
-                                    className="absolute -top-6 w-[130%] h-[125%] z-0 object-fill opacity-100 animate-fade-in pointer-events-none"
+                                    alt="glow"
+                                    fill
+                                    sizes="(max-width: 768px) 200px, 300px"
+                                    className="z-0 object-fill animate-fade-in pointer-events-none scale-110"
                                 />
                             )}
 
@@ -145,10 +150,12 @@ export default function VotePage() {
                                 relative w-48 h-64 md:w-64 md:h-[380px] z-10 flex items-center justify-center transition-all
                                 ${isHovered || isSelected ? "scale-105" : "scale-100 opacity-80"}
                             `}>
-                                <img 
+                                <Image
                                     src={can.image} 
-                                    alt={can.name} 
-                                    className="max-w-full max-h-full object-contain drop-shadow-2xl" 
+                                    alt={can.name}
+                                    fill
+                                    sizes="(max-width: 768px) 192px, 256px"
+                                    className="object-contain drop-shadow-2xl" 
                                 />
                                 <div className="absolute top-0 -left-10 font-lubrifont text-xl text-white/50">
                                     #{can.id}

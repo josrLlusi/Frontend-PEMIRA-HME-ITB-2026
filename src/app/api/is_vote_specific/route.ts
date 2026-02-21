@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 
   if (!vote) return NextResponse.json({ data: "false" });
 
-  if (category === 'ketua' && vote.pilihan_kahim) {
+  if (category === 'kahim' && vote.pilihan_kahim) {
     return NextResponse.json({ data: "true" });
   } 
   

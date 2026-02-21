@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import NavBar from "@/app/component/NavBar";
 import Cookies from "js-cookie";
+import Image from "next/image";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL /*|| 'http://localhost:3000'*/;
 
@@ -42,10 +43,12 @@ export default function LiveCount() {
       
       {/* BACKGROUND */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <img 
+        <Image 
           src="/thankyou-bg.png" 
           alt="Background" 
-          className="w-full h-full object-cover opacity-60" 
+          fill
+          priority
+          className="object-cover object-fill opacity-60" 
         />
       </div>
 
@@ -160,9 +163,11 @@ function CandidateCard({ id, name, photo, isSpecial = false}: any) {
 
       {/* Area Foto */}
       <div className="relative w-40 h-52 md:w-56 md:h-[280px] z-10 flex items-center justify-center mb-4">
-         <img 
+         <Image 
            src={photo} 
            alt={name} 
+           fill
+           sizes="(max-width: 768px) 160px, 224px"
            className={`max-w-full max-h-full object-contain drop-shadow-2xl transition-all duration-500
              ${isSpecial ? 'opacity-50' : 'grayscale-0'}`} 
          />

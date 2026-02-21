@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import LogoHeader from "@/app/component/LogoHeader";
 import Cookies from "js-cookie";
+import Image from "next/image";
 
 export default function DisclaimerPage() {
   const router = useRouter();
@@ -32,14 +33,17 @@ export default function DisclaimerPage() {
       
       {/* Background */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <img 
+        <Image 
           src="/disclaimer-bg.png" 
           alt="Background" 
+          fill
           className="w-full h-full object-cover opacity-40 md:opacity-60" 
         />
-        <img 
+        <Image 
           src="/disclaimer-decor.png" 
           alt="Decoration" 
+          fill
+          priority
           className="absolute inset-0 w-full h-full object-fill z-10 opacity-80 md:opacity-100" 
         />
       </div>
@@ -48,9 +52,11 @@ export default function DisclaimerPage() {
       <div className="relative z-20 w-[92%] max-w-4xl flex flex-col items-center justify-center p-2 my-auto">
         
         <div className="absolute inset-0 z-0">
-            <img 
+            <Image 
                 src="/modal-box.png" 
                 alt="Modal Box" 
+                fill
+                priority
                 className="w-full h-full object-fill rounded-3xl opacity-80 md:opacity-60 shadow-2xl" 
             />
         </div>

@@ -5,6 +5,7 @@ import Loading from "@/app/component/Loading";
 import Cookies from "js-cookie";
 import ErrorDialogBox from "@/app/component/ErrorDialogBox";
 import NavBar from "@/app/component/NavBar";
+import Image from "next/image";
 
 // KONFIGURASI API
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL /*|| 'http://localhost:3000'*/;
@@ -134,10 +135,12 @@ return (
 
       <div className="fixed inset-0 z-0 bg-gradient-to-b from-[#1A1A1A] to-[#010101]"></div>
       
-      <img 
+      <Image 
         src="/castle.png" 
         alt="Castle Decoration" 
-        className="fixed inset-0 w-full h-full object-fill object-bottom z-10 opacity-60 md:opacity-100 pointer-events-none" 
+        fill
+        priority
+        className="fixed inset-0 object-fill object-bottom z-10 opacity-60 md:opacity-100 pointer-events-none" 
       />
 
       {/* KONTEN UTAMA */}

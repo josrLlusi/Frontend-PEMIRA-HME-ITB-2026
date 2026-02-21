@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import imageCompression from "browser-image-compression";
 import LogoHeader from "@/app/component/LogoHeader";
 import Loading from "@/app/component/Loading";
+import Image from "next/image";
 
 
 export default function VerificationPage() {
@@ -160,7 +161,12 @@ export default function VerificationPage() {
                 className="w-full h-full object-cover transform -scale-x-100" 
             />
         ) : (
-            <img src={photo} alt="Preview" className="w-full h-full object-cover" />
+            <Image
+            src={photo}
+            alt="Preview"
+            fill
+            className="object-cover"
+            unoptimized />
         )}
       </div>
 
@@ -169,9 +175,13 @@ export default function VerificationPage() {
       <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/40 via-transparent to-black/60 pointer-events-none"></div>
       
       {/* Dekorasi Kamera */}
-      <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
-          <img src="/cam-decor.png" className="w-full h-screen object-fill opacity-80" 
-          alt="Frame" />
+      <div className="absolute inset-0 z-20 pointer-events-none">
+          <Image
+          src="/cam-decor.png"
+          alt="Frame"
+          fill
+          priority
+          className="w-full h-screen object-fill opacity-80" />
       </div>
 
       {/* HEADER */}
