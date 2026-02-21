@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Cookies from 'js-cookie';
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import LogoutModal from '@/app/component/LogOutModal'; 
+import LogoutModal from '@/app/component/LogoutModal'; 
 
 const NavBar = ({ data }: any) => {
   const router = useRouter();

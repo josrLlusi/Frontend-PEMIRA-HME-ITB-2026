@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import Loading from "@/app/component/Loading";
 import LogoHeader from "@/app/component/LogoHeader";
-import LogoutModal from "@/app/component/LogOutModal";
+import LogoutModal from "@/app/component/LogoutModal";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL /*|| 'http://localhost:3000'*/;
 const TOKEN = process.env.NEXT_PUBLIC_API_TOKEN;
