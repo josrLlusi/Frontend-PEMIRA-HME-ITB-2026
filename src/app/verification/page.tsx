@@ -28,6 +28,8 @@ export default function VerificationPage() {
   }, [router]);
   
   useEffect(() => {
+    let isCancelled = false;
+    let activeStream: MediaStream | null = null;
 
     async function enableCamera() {
       try {
@@ -38,7 +40,14 @@ export default function VerificationPage() {
               height: { ideal: 720 } 
           } 
         });
+        if (isCancelled) {
+          mediaStream.getTracks().forEach(track => track.stop());
+          return;
+        }
+
+        activeStream = mediaStream;
         setStream(mediaStream);
+
         if (videoRef.current) {
           videoRef.current.srcObject = mediaStream;
         }
@@ -50,8 +59,9 @@ export default function VerificationPage() {
     enableCamera();
 
     return () => {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+      isCancelled = true;
+      if (activeStream) {
+        activeStream.getTracks().forEach(track => track.stop());
       }
     };
   }, []);
