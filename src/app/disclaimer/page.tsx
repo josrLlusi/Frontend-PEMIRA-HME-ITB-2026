@@ -76,7 +76,7 @@ export default function DisclaimerPage() {
                 </div>
 
                 <blockquote className="bg-[#B3403D]/20 p-4 border-l-4 border-[#B3403D] italic text-sm md:text-base rounded-r-lg text-gray-300">
-                    "Data foto selfie Anda digunakan secara eksklusif untuk kepentingan audit kehadiran PEMIRA HME ITB 2026 dan tidak akan disalahgunakan untuk kepentingan di luar hal tersebut."
+                    &quot;Data foto selfie Anda digunakan secara eksklusif untuk kepentingan audit kehadiran PEMIRA HME ITB 2026 dan tidak akan disalahgunakan untuk kepentingan di luar hal tersebut.&quot;
                 </blockquote>
 
                 {/* Info Kontak Ringkas */}
