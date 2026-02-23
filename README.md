@@ -11,22 +11,12 @@ Change the .env.example to .env.local
 Change the token or url to your liking.
 After that, Open your terminal.
 Don't forget to change the directory to this project folder.
-run this code on the terminal to create a database.db:
-```bash
-node src/scripts/setup-db.js
-```
-Make sure you got a completion message.
+
 
 Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
