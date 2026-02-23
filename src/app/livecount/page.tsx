@@ -21,10 +21,12 @@ export default function LiveCount() {
       try {
         const resTotal = await fetch(`${API_BASE_URL}/api/live_count`);
         const data = await resTotal.json();
+
+        console.log("ini data counting", data)
         
         // Simpan data dari backend ke state
-        if (data && typeof data.suara === 'number') {
-          setTotalVoted(data.suara);
+        if (data && typeof data.votedBoth === 'number') {
+          setTotalVoted(data.votedBoth);
         }
       } catch (error) {
         console.error("Gagal mengambil data partisipasi:", error);
@@ -130,9 +132,9 @@ export default function LiveCount() {
                 background: `linear-gradient(90deg, #8A6D3B 0%, #FFC045 50%, #DDC28E 100%)`
             }}
           >
-             <div className="w-full h-full relative overflow-hidden">
+             {/* <div className="w-full h-full relative overflow-hidden">
                 <div className="absolute inset-0 bg-white/20 skew-x-12 translate-x-full animate-shine"></div>
-             </div>
+             </div> */}
           </div>
           
           <div className="absolute inset-0 flex items-center justify-center z-10">
