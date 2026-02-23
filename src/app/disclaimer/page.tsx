@@ -10,7 +10,7 @@ export default function DisclaimerPage() {
   const [agreed, setAgreed] = useState(false);
   const [showCopyPopup, setShowCopyPopup] = useState(false);
 
-  const contactPerson = "081234567890 (Panitia PEMIRA)";
+  const contactPerson = "081374381461 (Vanadia Valianti)";
 
   useEffect(() => {
     const id = Cookies.get("ChampID");

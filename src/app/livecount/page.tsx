@@ -12,7 +12,7 @@ export default function LiveCount() {
   // State untuk menyimpan semua data suara
   const [totalVoted, setTotalVoted] = useState(0);
 
-  const TARGET_KUORUM = 500; //sekian sekian
+  const TARGET_KUORUM = 596; //sekian sekian
 
   useEffect(() => {
     setCookieValue(Cookies.get("ChampID"));
