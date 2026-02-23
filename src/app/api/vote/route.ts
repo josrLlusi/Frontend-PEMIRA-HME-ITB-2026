@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   await db.run('INSERT OR IGNORE INTO votes (nim) VALUES (?)', [username]);
 
   // 2. Update kolom sesuai kategori
-  if (category === 'ketua') {
+  if (category === 'kahim') {
     await db.run(
       'UPDATE votes SET pilihan_kahim = ?, waktu_kahim = datetime("now") WHERE nim = ?', 
       [pilihan, username]

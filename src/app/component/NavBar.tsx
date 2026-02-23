@@ -57,11 +57,11 @@ const NavBar = ({ data }: any) => {
   return (
     <>
       <nav className="fixed top-0 left-0 w-full z-[80] transition-all duration-300">
-        <div className="mx-auto px-4 md:px-8 py-3 flex justify-between items-center bg-black/40 backdrop-blur-md border-b border-white/5">
+        <div className="mx-auto px-4 md:px-8 py-1 flex justify-between items-center bg-black/20 border-b border-white/5">
         
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => router.push('/')}>
-            <div className="relative h-10 w-10 md:h-16 md:w-16">
-              <Image src="/Group 149.png" alt="Logo" fill className="object-contain" />
+            <div className="relative h-12 w-12 md:h-20 md:w-20">
+              <Image src="/Group 149.png" alt="Logo" fill sizes="(max-width: 768px) 120px, 200px" className="object-contain" />
             </div>
             <div className="block">
               <h1 className="text-[#FFC045] font-lubrifont text-lg leading-none uppercase">PEMIRA HME</h1>
@@ -71,8 +71,9 @@ const NavBar = ({ data }: any) => {
 
         
           <div className="flex items-center gap-3 md:gap-6">
-            <button onClick={() => router.push('/livecount')} className="px-4 py-1.5 border border-[#FFC045]/40 rounded-full hover:bg-[#FFC045]/10 transition-all">
-              <span className="text-[#FFC045] font-bold text-[10px] md:text-sm tracking-wide">LIVE COUNT</span>
+            <button onClick={() => router.push('/livecount')} className="min-w-[85px] md:min-w-[120px] h-8 md:h-10 px-4 border border-[#FFC045]/40 rounded-full flex items-center justify-center bg-black hover:bg-[#999999]/50 transition-all text-[#FFC045] font-bold text-[10px] md:text-sm tracking-wide whitespace-nowrap">
+               
+               LIVE COUNT
             </button>
 
             {isLoggedIn && (
@@ -84,7 +85,7 @@ const NavBar = ({ data }: any) => {
 
             <button
               onClick={handleNavButtonClick}
-              className={`px-4 py-1.5 rounded-full font-bold text-[10px] md:text-sm transition-all ${isLoggedIn ? "bg-[#D22B2B] text-white hover:bg-red-700" : "bg-[#FFC045] text-black hover:bg-yellow-500"}`}
+              className={`min-w-[85px] md:min-w-[120px] h-8 md:h-10 px-4 border border-white rounded-full flex items-center justify-center font-bold text-[10px] md:text-sm tracking-wide transition-all whitespace-nowrap ${isLoggedIn ? "bg-[#D22B2B] text-white hover:bg-red-700" : "bg-[#FFC045] text-black hover:bg-yellow-500"}`}
             >
               {isLoggedIn ? "LOGOUT" : "LOGIN"}
             </button>

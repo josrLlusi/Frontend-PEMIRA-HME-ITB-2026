@@ -5,17 +5,18 @@ import Cookies from "js-cookie";
 import Loading from "@/app/component/Loading";
 import LogoHeader from "@/app/component/LogoHeader";
 import LogoutModal from "@/app/component/LogoutModal";
+import Image from "next/image";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL /*|| 'http://localhost:3000'*/;
 const TOKEN = process.env.NEXT_PUBLIC_API_TOKEN;
 
 export default function SelectionPage() {
   const router = useRouter();
-  const [votedStatus, setVotedStatus] = useState({ ketua: false, senator: false });
+  const [votedStatus, setVotedStatus] = useState({ kahim: false, senator: false });
   const [isLoading, setIsLoading] = useState(true);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   
-  const isAllVoted = votedStatus.ketua && votedStatus.senator;
+  const isAllVoted = votedStatus.kahim && votedStatus.senator;
 
   useEffect(() => {
     const id = Cookies.get("ChampID");
@@ -28,7 +29,7 @@ export default function SelectionPage() {
           fetch(`${API_BASE_URL}/api/is_vote_specific`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username: id, category: "ketua", token: TOKEN }),
+            body: JSON.stringify({ username: id, category: "kahim", token: TOKEN }),
           }),
           fetch(`${API_BASE_URL}/api/is_vote_specific`, {
             method: "POST",
@@ -41,7 +42,7 @@ export default function SelectionPage() {
         const dataSenator = await resSenator.json();
 
         setVotedStatus({
-          ketua: dataKetua.data === "true",
+          kahim: dataKetua.data === "true",
           senator: dataSenator.data === "true"
         });
       } catch (error) {
@@ -66,13 +67,17 @@ export default function SelectionPage() {
       
       {/* BACKGROUND */}
       <div className="fixed inset-0 z-0 bg-gradient-to-b from-[#1A1A1A] to-[#010101]"></div>
-      <img 
+      <div className="fixed inset-0 z-0 pointer-events-none">
+      <Image
         src="/selection-decor.png" 
         alt="decor" 
-        className={`fixed inset-0 w-full h-full object-fill z-1 pointer-events-none transition-all duration-1000 ${
+        fill
+        priority
+        className={`object-fill z-1 pointer-events-none transition-all duration-1000 ${
           isAllVoted ? "opacity-100 blur-0" : "opacity-100 blur-sm"
         }`} 
       />
+      </div>
 
       <div className="relative z-10 w-full max-w-7xl px-4 flex flex-col items-center">
         
@@ -99,7 +104,12 @@ export default function SelectionPage() {
                         : "hover:scale-110 hover:bg-white/5 border-2 border-transparent hover:border-[#FFC045]/30 cursor-pointer shadow-[0_0_50px_rgba(255,192,69,0.1)]"
                     }`}
                 >
-                    <img src="/icon-senator.png" alt="Senator" className="max-w-full max-h-full object-contain drop-shadow-2xl" />
+                    <Image
+                    src="/icon-senator.png" 
+                    alt="Senator" 
+                    fill
+                    sizes="(max-width: 768px) 200px, 300px"
+                    className="max-w-full max-h-full object-contain drop-shadow-2xl p-4" />
                     {votedStatus.senator && (
                         <div className="absolute inset-0 flex items-center justify-center">
                             <span className="bg-black/80 text-[#FFC045] border border-[#FFC045] px-6 py-2 rounded-lg font-lubrifont text-sm tracking-widest">VOTED</span>
@@ -112,22 +122,27 @@ export default function SelectionPage() {
             {/* KAHIM */}
             <div className="flex flex-col items-center group w-[260px] md:w-[320px]">
                 <button
-                    onClick={() => router.push('/vote/ketua')}
-                    disabled={votedStatus.ketua || isLoading}
+                    onClick={() => router.push('/vote/kahim')}
+                    disabled={votedStatus.kahim || isLoading}
                     className={`relative w-full h-[200px] md:h-[300px] flex items-center justify-center transition-all duration-500 rounded-3xl p-4 ${
-                        votedStatus.ketua 
+                        votedStatus.kahim 
                         ? "opacity-40 grayscale cursor-not-allowed border-2 border-white/10" 
                         : "hover:scale-110 hover:bg-white/5 border-2 border-transparent hover:border-[#FFC045]/30 cursor-pointer shadow-[0_0_50px_rgba(255,192,69,0.1)]"
                     }`}
                 >
-                    <img src="/icon-kahim.png" alt="Kahim" className="max-w-full max-h-full object-contain drop-shadow-2xl" />
-                    {votedStatus.ketua && (
+                    <Image
+                    src="/icon-kahim.png"
+                    alt="Kahim"
+                    fill
+                    sizes="(max-width: 768px) 200px, 300px"
+                    className="max-w-full max-h-full object-contain drop-shadow-2xl p-4" />
+                    {votedStatus.kahim && (
                         <div className="absolute inset-0 flex items-center justify-center">
                             <span className="bg-black/80 text-[#FFC045] border border-[#FFC045] px-6 py-2 rounded-lg font-lubrifont text-sm tracking-widest">VOTED</span>
                         </div>
                     )}
                 </button>
-                <h2 className={`mt-6 font-lubrifont text-2xl tracking-widest transition-all ${votedStatus.ketua ? "text-gray-500" : "text-gradient-silver"}`}>KAHIM</h2>
+                <h2 className={`mt-6 font-lubrifont text-2xl tracking-widest transition-all ${votedStatus.kahim ? "text-gray-500" : "text-gradient-silver"}`}>KAHIM</h2>
             </div>
         </div>
 

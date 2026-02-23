@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import NavBar from "@/app/component/NavBar";
 import Cookies from "js-cookie";
+import Image from "next/image";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL /*|| 'http://localhost:3000'*/;
 
@@ -11,7 +12,7 @@ export default function LiveCount() {
   // State untuk menyimpan semua data suara
   const [totalVoted, setTotalVoted] = useState(0);
 
-  const TARGET_KUORUM = 500; //sekian sekian
+  const TARGET_KUORUM = 596; //sekian sekian
 
   useEffect(() => {
     setCookieValue(Cookies.get("ChampID"));
@@ -20,10 +21,12 @@ export default function LiveCount() {
       try {
         const resTotal = await fetch(`${API_BASE_URL}/api/live_count`);
         const data = await resTotal.json();
+
+        console.log("ini data counting", data)
         
         // Simpan data dari backend ke state
-        if (data && typeof data.suara === 'number') {
-          setTotalVoted(data.suara);
+        if (data && typeof data.votedBoth === 'number') {
+          setTotalVoted(data.votedBoth);
         }
       } catch (error) {
         console.error("Gagal mengambil data partisipasi:", error);
@@ -42,10 +45,12 @@ export default function LiveCount() {
       
       {/* BACKGROUND */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <img 
+        <Image 
           src="/thankyou-bg.png" 
           alt="Background" 
-          className="w-full h-full object-cover opacity-60" 
+          fill
+          priority
+          className="object-cover object-fill opacity-60" 
         />
       </div>
 
@@ -127,9 +132,9 @@ export default function LiveCount() {
                 background: `linear-gradient(90deg, #8A6D3B 0%, #FFC045 50%, #DDC28E 100%)`
             }}
           >
-             <div className="w-full h-full relative overflow-hidden">
+             {/* <div className="w-full h-full relative overflow-hidden">
                 <div className="absolute inset-0 bg-white/20 skew-x-12 translate-x-full animate-shine"></div>
-             </div>
+             </div> */}
           </div>
           
           <div className="absolute inset-0 flex items-center justify-center z-10">
@@ -160,9 +165,11 @@ function CandidateCard({ id, name, photo, isSpecial = false}: any) {
 
       {/* Area Foto */}
       <div className="relative w-40 h-52 md:w-56 md:h-[280px] z-10 flex items-center justify-center mb-4">
-         <img 
+         <Image 
            src={photo} 
            alt={name} 
+           fill
+           sizes="(max-width: 768px) 160px, 224px"
            className={`max-w-full max-h-full object-contain drop-shadow-2xl transition-all duration-500
              ${isSpecial ? 'opacity-50' : 'grayscale-0'}`} 
          />

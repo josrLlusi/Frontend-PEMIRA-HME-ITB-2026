@@ -50,7 +50,7 @@ async function setup() {
   await db.run(`INSERT OR IGNORE INTO users (nim, nama, password) VALUES ('13221002', 'Siti Aminah', '12345')`);
   await db.run(`INSERT OR IGNORE INTO users (nim, nama, password) VALUES ('13221003', 'Asep Knalpot', '12345')`);
   await db.run(`INSERT OR IGNORE INTO users (nim, nama, password) VALUES ('13224013', 'Jose Ganteng', 'BANGGANTENG')`);
-  await db.run(`INSERT OR IGNORE INTO users (nim, nama, password) VALUES ('1300014', 'Dimas Ganteng', 'BANGGANTENG')`);
+  await db.run(`INSERT OR IGNORE INTO users (nim, nama, password) VALUES ('1300014', 'Dimas AI', 'BANGGANTENG')`);
 
   console.log('🎉 Database siap digunakan! File: database.db');
 }

@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import NavBar from "@/app/component/NavBar";
 import Cookies from "js-cookie";
+import Image from "next/image";
 
 export default function ThankYouPage() {
   const router = useRouter();
@@ -30,7 +31,12 @@ export default function ThankYouPage() {
   return (
     <main className="relative w-full min-h-screen bg-black overflow-x-hidden flex flex-col items-center justify-center py-20 px-4">
       <div className="fixed inset-0 z-0">
-        <img src="/thankyou-bg.png" alt="BG" className="w-full h-full object-cover opacity-100" />
+        <Image
+        src="/thankyou-bg.png"
+        alt="BG"
+        fill
+        priority
+        className="object-fill opacity-100" />
       </div>
 
       <div className="relative z-10 flex flex-col items-center text-center animate-fade-in w-full max-w-lg">

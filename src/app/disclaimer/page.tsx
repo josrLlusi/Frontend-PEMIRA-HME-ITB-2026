@@ -3,13 +3,14 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import LogoHeader from "@/app/component/LogoHeader";
 import Cookies from "js-cookie";
+import Image from "next/image";
 
 export default function DisclaimerPage() {
   const router = useRouter();
   const [agreed, setAgreed] = useState(false);
   const [showCopyPopup, setShowCopyPopup] = useState(false);
 
-  const contactPerson = "081234567890 (Panitia PEMIRA)";
+  const contactPerson = "081374381461 (Vanadia Valianti)";
 
   useEffect(() => {
     const id = Cookies.get("ChampID");
@@ -32,14 +33,17 @@ export default function DisclaimerPage() {
       
       {/* Background */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <img 
+        <Image 
           src="/disclaimer-bg.png" 
           alt="Background" 
+          fill
           className="w-full h-full object-cover opacity-40 md:opacity-60" 
         />
-        <img 
+        <Image 
           src="/disclaimer-decor.png" 
           alt="Decoration" 
+          fill
+          priority
           className="absolute inset-0 w-full h-full object-fill z-10 opacity-80 md:opacity-100" 
         />
       </div>
@@ -48,9 +52,11 @@ export default function DisclaimerPage() {
       <div className="relative z-20 w-[92%] max-w-4xl flex flex-col items-center justify-center p-2 my-auto">
         
         <div className="absolute inset-0 z-0">
-            <img 
+            <Image 
                 src="/modal-box.png" 
                 alt="Modal Box" 
+                fill
+                priority
                 className="w-full h-full object-fill rounded-3xl opacity-80 md:opacity-60 shadow-2xl" 
             />
         </div>
@@ -76,7 +82,7 @@ export default function DisclaimerPage() {
                 </div>
 
                 <blockquote className="bg-[#B3403D]/20 p-4 border-l-4 border-[#B3403D] italic text-sm md:text-base rounded-r-lg text-gray-300">
-                    "Data foto selfie Anda digunakan secara eksklusif untuk kepentingan audit kehadiran PEMIRA HME ITB 2026 dan tidak akan disalahgunakan untuk kepentingan di luar hal tersebut."
+                    &quot;Data foto selfie Anda digunakan secara eksklusif untuk kepentingan audit kehadiran PEMIRA HME ITB 2026 dan tidak akan disalahgunakan untuk kepentingan di luar hal tersebut.&quot;
                 </blockquote>
 
                 {/* Info Kontak Ringkas */}
